@@ -25,10 +25,9 @@
           <button class="btn btn-outline-primary" id="a-modal" data-bs-toggle="modal" data-bs-target="#modal-buscar">
             Buscar Grupo
           </button>
-          <button class="btn btn-outline-danger" id="a-modal" data-bs-toggle="modal" data-bs-target="#modal-eliminar"><i class="fa-solid fa-delete-left"></i> 
-            Eliminar
-          </button>
-
+          <button class="btn btn-outline-info" id="a-modal" data-bs-toggle="modal" data-bs-target="#modal-alquileres">
+            Listar alquileres
+          </button>          
         </div>
 
 
@@ -37,10 +36,11 @@
             <tr>
               <th>Id</th>
               <th>Equipo</th>
-              <th>Voltaje</th>
+              <th>kva</th>
               <th>Descripcion</th>
               <th>Tipo</th>
               <th>Precio Usd</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="electrogeno">
@@ -49,6 +49,7 @@
         </table>
         <div id="aviso">
         </div>
+
       </div>
       
     </div>
@@ -149,6 +150,29 @@
             </div>
           </div>
         </div>
+
+
+   <!-- Modal alquiler -->
+   <div class="modal fade" id="modal-alquileres" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Listado de equipos alquilados</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="alquilado-equipo"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+        
     
   </body>
   <script src="./assets/js/index.js"></script>

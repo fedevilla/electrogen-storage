@@ -8,15 +8,11 @@ let divAviso = document.getElementById("aviso")
 const btnEliminar = document.getElementById("eliminar-grupo")
 const btnAgregarIndividual = document.getElementById("prueba")
 
+refresh();
+
 btnBuscar.addEventListener("click", () => {
     let element = document.getElementById("nombre-buscar").value;
     searchEquipo(divAviso, element)
-});
-
-btnEliminar.addEventListener("click", () => {
-    const equipo = document.getElementById("eliminar-text-grupo").value;
-    borrarEquipo(deposito.obtenerDeposito(), divAviso, equipo)
-    table.innerHTML = list(deposito.obtenerDeposito(), divAviso)
 });
 
 btnAgregar.addEventListener("click", () => {
@@ -30,6 +26,8 @@ btnAgregar.addEventListener("click", () => {
      let form = '#guardar-grupo';
      if(verifyLoop(form)){
         table.innerHTML = addEquipo(nombre, kva, descripcion, tipo, precio);
+        recorrerDeposito(deposito);
+        refresh()
      }
-
 })
+

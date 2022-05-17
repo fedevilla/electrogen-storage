@@ -2,15 +2,6 @@
 en tres aspectos: alquiler, venta y mantenimiento de correctivo
  */
 
-//Menu de ingreso
-const MSG_MENU = {nuevos_equipos: "Ingrese la cantidad de equipos que quiere ingresar entre 1 y 5 equipos"}
-
-const SUBMENU = "Seleccione entre las opciones disponibles:" + "\n" +
-                " a. Ver listado de equipos activos" + "\n" +
-                " b. Agregar un equipo" + "\n" +
-                " c. Quitar un equipo" + "\n" +
-                " d. Buscar equipo por nombre" + "\n";
-
 //creo objeto de errores
 const ERRORES = {
                  error_voltaje: "Ha seleccionado correctivo. No hace falta calcular Voltaje.",
@@ -87,13 +78,19 @@ class Deposito{
         if(index != -1){
             this.nuevoEquipo.splice(index, 1);
             details.innerHTML = "";
-            details.innerHTML = '<div class="alert alert-danger" id="detalle" role="alert">El equipo ' + Equipo +  'ha sido eliminado del depósito`</div>';
+            details.innerHTML = '<div class="alert alert-danger" id="detalle" role="alert">El equipo ' + Equipo +  ' ha sido eliminado del depósito`</div>';
             
         }else{
             details.innerHTML = "";
             details.innerHTML = '<div class="alert alert-danger" id="detalle" role="alert">El equipo ' + Equipo +  'no se encuentra registrado en deposito`</div>';
         }
 
+    }
+
+    eliminarEquipoStorage(equipo, details){
+        localStorage.removeItem(equipo);
+        details.innerHTML = "";
+        details.innerHTML = '<div class="alert alert-danger" id="detalle" role="alert">El equipo ' + equipo +  ' ha sido eliminado del depósito`</div>';
     }
 
     obtenerDeposito(){
@@ -108,6 +105,24 @@ class Deposito{
       
     }
 
+        //con storage
+    obtenerDepositoStorage(){
+            let equiposSeleccionados = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                    equiposSeleccionados.push(JSON.parse(localStorage.getItem(i)))
+            }
+            console.log(localStorage)
+           return equiposSeleccionados;
+           
+         }
+
+    alquilarEquipo(Equipo, details){
+        agregarAlquiler(Equipo)
+        details.innerHTML = "";
+        details.innerHTML = '<div class="alert alert-info" id="detalle" role="alert">El equipo seleccionado ha sido enviado a alquiler`</div>';
+
+    }
+
 }
 
 
@@ -116,7 +131,8 @@ const list = (arr, details) => {
     let output = "";
     if(arr.length > 0){
         for (let i = 0; i < arr.length; i++) {
-            output += `<tr><td>${i}</td><td> ${arr[i].Equipo}</td> <td>${arr[i].kva}</td> <td>${arr[i].Descripcion}</td> <td>${arr[i].Tipo}</td> <td>Usd ${arr[i].Precio}</td></tr>`;
+            output += `<tr><td>${i}</td><td> ${arr[i].nombre}</td> <td>${arr[i].kva}</td> <td>${arr[i].descripcion}</td> <td>${arr[i].tipo}</td> <td>Usd ${arr[i].precio}</td>
+                       <td><button class="btn btn-outline-success alquilar" style="margin-right: 5px;" id="${i}">Alquilar</button></td></tr>`;
         }
         details.innerHTML = "";
         details.innerHTML = '<div class="alert alert-success" id="detalle" role="alert">Existen '+ arr.length +' electrogenos en deposito</div>';
@@ -127,10 +143,11 @@ const list = (arr, details) => {
         details.innerHTML = '<div class="alert alert-primary" id="detalle" role="alert">'+ ERRORES.error_deposito+'</div>'
         return output = "";
     }
+    
 } 
 
 
-//agrego multiples equipos
+//agrego equipos
 const addEquipo = (nombre, kva, descripcion, tipo, precio) => {
 
     let nuevoEquipo;
@@ -141,8 +158,91 @@ const addEquipo = (nombre, kva, descripcion, tipo, precio) => {
     nuevoEquipo.actividad();
 
     return list(deposito.obtenerDeposito(), divAviso);
+}
+
+
+
+//agregar Local Storage
+const agregarLocalstorage = (clave, valor) => {
+        localStorage.setItem(clave, valor)
+}
+
+const recorrerDeposito = (deposito) => {
+    if(localStorage.length != 0){
+        let claveInicial = parseInt(localStorage.length)
+        for (let i = 0; i < deposito.nuevoEquipo.length; i++) {
+            agregarLocalstorage(claveInicial, JSON.stringify(deposito.nuevoEquipo[i]))
+        }
+    }else{
+        for (let i = 0; i < deposito.nuevoEquipo.length; i++) {
+            agregarLocalstorage(i, JSON.stringify(deposito.nuevoEquipo[i]))
+    
+        }
+    }
 
 }
+
+
+//agregar equipo alquilado
+
+const agregarAlquiler = (el) => {
+    const resposnseFind = deposito.obtenerDepositoStorage();
+    let divPadre = document.getElementById("alquilado-equipo")
+    let div = document.createElement("div")
+    div.classList.add("card-2");
+    div.innerHTML = `    <div style="padding: 10px;">
+    <div style="padding-bottom: 3px;"><b><h3>Equipo: </b> ${resposnseFind[el].nombre}</h3></div>
+    <div style="padding-bottom: 3px;"<b>Descripcion:</b> ${resposnseFind[el].descripcion}</div>
+    <div style="padding-bottom: 3px;"<b>Tipo: </b> ${resposnseFind[el].tipo}</div>
+    <div style="padding-bottom: 3px;"<b>Precio: Usd </b> ${resposnseFind[el].precio}</div>
+    </div>`
+    divPadre.append(div)
+}
+
+const loaderEventos = () => {
+    if(localStorage.length != 0){
+        let arrAlqu = document.querySelectorAll(".alquilar");
+        let arrElim = document.querySelectorAll(".eliminar");
+        agregarEventos(arrAlqu, "alquiler");
+        agregarEventos(arrElim, "eliminar");
+    }
+}
+
+
+//agregaeventos
+const agregarEventos = (arr, evento) => {
+    switch (evento) {
+        case "alquiler":
+            arr.forEach(element => {
+                element.addEventListener("click", () => {
+                    let equipo = element.id;
+                    deposito.alquilarEquipo(equipo, divAviso)
+                    element.disabled = true;
+                    element.innerHTML = "Alquilado"
+                    element.style.background = "red";
+                    element.style.color = "white";
+                    element.style.border = "1px solid white"
+                })
+            })
+            break;
+        
+        case "eliminar":
+            arr.forEach(element => {
+                element.addEventListener("click", () => {
+                    let equipo = element.id;
+                    borrarEquipoStorage(deposito.obtenerDepositoStorage(), divAviso, equipo)
+                    refresh();
+                })
+            })
+             break;
+    
+        default:
+            break;
+    }
+
+}
+
+
 
 //busca equipo
 const searchEquipo = (details, el) => {
@@ -160,11 +260,19 @@ const searchEquipo = (details, el) => {
 }
 
 //borra equipo
-const borrarEquipo = (arr, details, equipoEliminar) => {
+const borrarEquipoStorage = (arr, details, equipoEliminar) => {
     if(arr.length > 0){
-        deposito.eliminarEquipo(equipoEliminar, details);
+        deposito.eliminarEquipoStorage(equipoEliminar, details);
     }
 
+}
+
+//refresh
+const refresh = () => {
+    let table = document.getElementById("electrogeno")
+    let divAviso = document.getElementById("aviso")
+    table.innerHTML = list(deposito.obtenerDepositoStorage(), divAviso);
+    loaderEventos();
 }
 
 //borro todos los campos
