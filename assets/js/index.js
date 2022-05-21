@@ -18,20 +18,6 @@ const ENTRADAS = {msg_voltaje: "Ingrese la cantidad de horas necesarias para cal
 const LIMITS = {limit_menu_down: 0, limit_menu_up: 5, limit_down_q_electrogenos: 1, limit_up_q_electrogenos: 5};
 let output = "";
 
- //voltaje
-let voltaje = (tipo, horas) => {
-    if(tipo === 1 || tipo === 2){
-        horas = parseInt(prompt(ENTRADAS.msg_voltaje));
-        while(isNaN(horas)){
-            alert(ERRORES.error_formato);
-            horas = parseInt(prompt(ENTRADAS.msg_voltaje));
-        }
-        const VOLTAJE = 2;
-        return horas * VOLTAJE;
-    }else{
-        alert(ERRORES.error_voltaje);
-    }
-}
 
 //Creacion de Clase grupo electrogeno
 class Electrogeno{
