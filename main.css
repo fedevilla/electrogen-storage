@@ -1,0 +1,74 @@
+@import url('http://fonts.cdnfonts.com/css/roboto');
+
+body{
+    width: 1024px; margin: 0 auto; background-color: #e2e1e0; font-family: "Roboto";
+}
+
+.main-container{
+    width: 1020px; margin: 0; background-color: #fff; border-radius: 2px; height: 800px;;
+}
+
+input[type="text"], input[type="number"]{
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #cecece;
+    outline: none !important;
+    width: 100%;
+}
+
+.label-custom{
+    font-family: "Roboto";
+    font-size: 9px;
+    color: grey;
+}
+
+.number-field{
+    width: 50%;
+}
+
+
+input[type="text"]:focus, input[type="number"] {
+    border-bottom: 1px solid rgb(67, 165, 208);
+  }
+
+.margin-auto {
+    padding-top: 100px;
+    display: flex;
+    height: 100px;
+    color: #333;
+  }
+  
+  .margin-auto__content {
+    margin: auto;
+  }
+
+  .tabla{
+      margin: 100px 20px 10px 20px;
+  }
+
+  .botonera{
+      margin: 5px 5px 5px 5px;
+  }
+
+  button{
+      font-size: 12px !important;
+      font-family: "Roboto";
+  }
+
+  .details{
+      font-size: 11px !important;
+      font-family: "Roboto";
+  }
+
+  .error-span-data{
+      color:red;
+      font-size:10px;
+  }
+
+  .card-2 {
+    background: #fff;
+    border-radius: 2px;
+    margin: 1rem;
+    position: relative;
+    border: 1px solid #cecece
+  }
