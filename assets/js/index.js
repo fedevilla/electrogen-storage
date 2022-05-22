@@ -2,6 +2,13 @@
 en tres aspectos: alquiler, venta y mantenimiento de correctivo
  */
 
+//creo objeto de errores
+const ERRORES = {
+                 error_voltaje: "Ha seleccionado correctivo. No hace falta calcular Voltaje.",
+                 error_formato: "Ingresado las horas en formato incorrecto",
+                 error_equipo: "No se encuentra el equipo buscado",
+                 error_deposito: "No existe equipo registrado en el depósito."};
+
 let output = "";
 
 
