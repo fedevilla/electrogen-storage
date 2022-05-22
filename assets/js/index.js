@@ -2,36 +2,8 @@
 en tres aspectos: alquiler, venta y mantenimiento de correctivo
  */
 
-//creo objeto de errores
-const ERRORES = {
-                 error_voltaje: "Ha seleccionado correctivo. No hace falta calcular Voltaje.",
-                 error_formato: "Ingresado las horas en formato incorrecto",
-                 error_equipo: "No se encuentra el equipo buscado",
-                 error_deposito: "No existe equipo registrado en el depósito."};
-
-
-//mensajes de inputs
-const ENTRADAS = {msg_voltaje: "Ingrese la cantidad de horas necesarias para calcular voltaje",
-                 }
-
-//Objeto de limites
-const LIMITS = {limit_menu_down: 0, limit_menu_up: 5, limit_down_q_electrogenos: 1, limit_up_q_electrogenos: 5};
 let output = "";
 
- //voltaje
-let voltaje = (tipo, horas) => {
-    if(tipo === 1 || tipo === 2){
-        horas = parseInt(prompt(ENTRADAS.msg_voltaje));
-        while(isNaN(horas)){
-            alert(ERRORES.error_formato);
-            horas = parseInt(prompt(ENTRADAS.msg_voltaje));
-        }
-        const VOLTAJE = 2;
-        return horas * VOLTAJE;
-    }else{
-        alert(ERRORES.error_voltaje);
-    }
-}
 
 //Creacion de Clase grupo electrogeno
 class Electrogeno{
@@ -109,9 +81,8 @@ class Deposito{
     obtenerDepositoStorage(){
             let equiposSeleccionados = [];
             for (let i = 0; i < localStorage.length; i++) {
-                    equiposSeleccionados.push(JSON.parse(localStorage.getItem(i)))
+                    equiposSeleccionados.push(JSON.parse(localStorage.getItem(localStorage.key(i))))
             }
-            console.log(localStorage)
            return equiposSeleccionados;
            
          }
@@ -120,7 +91,6 @@ class Deposito{
         agregarAlquiler(Equipo)
         details.innerHTML = "";
         details.innerHTML = '<div class="alert alert-info" id="detalle" role="alert">El equipo seleccionado ha sido enviado a alquiler`</div>';
-
     }
 
 }
@@ -129,10 +99,13 @@ class Deposito{
 //listamos todas los equipos con sus caracteristicas
 const list = (arr, details) => {
     let output = "";
+
     if(arr.length > 0){
         for (let i = 0; i < arr.length; i++) {
-            output += `<tr><td>${i}</td><td> ${arr[i].nombre}</td> <td>${arr[i].kva}</td> <td>${arr[i].descripcion}</td> <td>${arr[i].tipo}</td> <td>Usd ${arr[i].precio}</td>
-                       <td><button class="btn btn-outline-success alquilar" style="margin-right: 5px;" id="${i}">Alquilar</button></td></tr>`;
+            output += `<tr><td>${i}</td><td> ${arr[i]?.nombre}</td> <td>${arr[i]?.kva}</td> <td>${arr[i]?.descripcion}</td> <td>${arr[i]?.tipo}</td> <td>Usd ${arr[i]?.precio}</td>
+                       <td><button class="btn btn-outline-success alquilar" style="margin-right: 5px;" id="${i}">Alquilar</button>
+                       </td>
+                       </tr>`;
         }
         details.innerHTML = "";
         details.innerHTML = '<div class="alert alert-success" id="detalle" role="alert">Existen '+ arr.length +' electrogenos en deposito</div>';
@@ -141,6 +114,7 @@ const list = (arr, details) => {
     }else{
         details.innerHTML = "";
         details.innerHTML = '<div class="alert alert-primary" id="detalle" role="alert">'+ ERRORES.error_deposito+'</div>'
+        
         return output = "";
     }
     
@@ -153,9 +127,9 @@ const addEquipo = (nombre, kva, descripcion, tipo, precio) => {
     let nuevoEquipo;
     let divAviso = document.getElementById("aviso")
     nuevoEquipo = new Electrogeno(nombre, kva, descripcion, tipo, precio);
-     //activo equipo
     deposito.agregarEquipo(nuevoEquipo);
     nuevoEquipo.actividad();
+    msgResponse(`Equipo ${nombre} ingrsado con exito`, `El equipo tiene ${kva} kva y es de tipo ${tipo}. El precio ingresado es ${precio}. Si desea modificarlo puede hacerlo luego.`, 5000)
 
     return list(deposito.obtenerDeposito(), divAviso);
 }
@@ -215,34 +189,40 @@ const agregarEventos = (arr, evento) => {
         case "alquiler":
             arr.forEach(element => {
                 element.addEventListener("click", () => {
-                    let equipo = element.id;
-                    deposito.alquilarEquipo(equipo, divAviso)
-                    element.disabled = true;
-                    element.innerHTML = "Alquilado"
-                    element.style.background = "red";
-                    element.style.color = "white";
-                    element.style.border = "1px solid white"
+                    Swal.fire({
+                        title: '¿Está seguro de alquilar el equipo?',
+                        text: "Al alquilarlo quedara confirmado el alquiler y debera listarlo con el boton listar alquileres.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Alquilar'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            let equipo = element.id;
+                            deposito.alquilarEquipo(equipo, divAviso)
+                            element.disabled = true;
+                            element.innerHTML = "Alquilado"
+                            element.style.background = "red";
+                            element.style.color = "white";
+                            element.style.border = "1px solid white"
+                          Swal.fire(
+                            'Equipo alquilado con exito',
+                            'El equipo ha sido reservado',
+                            'success'
+                          )
+                        }
+                      })
+
                 })
             })
             break;
-        
-        case "eliminar":
-            arr.forEach(element => {
-                element.addEventListener("click", () => {
-                    let equipo = element.id;
-                    borrarEquipoStorage(deposito.obtenerDepositoStorage(), divAviso, equipo)
-                    refresh();
-                })
-            })
-             break;
-    
+            
         default:
             break;
     }
 
 }
-
-
 
 //busca equipo
 const searchEquipo = (details, el) => {
@@ -261,9 +241,7 @@ const searchEquipo = (details, el) => {
 
 //borra equipo
 const borrarEquipoStorage = (arr, details, equipoEliminar) => {
-    if(arr.length > 0){
-        deposito.eliminarEquipoStorage(equipoEliminar, details);
-    }
+    arr.length > 0 && deposito.eliminarEquipoStorage(equipoEliminar, details)
 
 }
 
@@ -305,21 +283,44 @@ const verifyElement = (input, el) => {
 const verifyLoop = (div) => {
     let arrElements = document.querySelectorAll(div + '> input');
     let control = 0;
+    let resp = false;
     arrElements.forEach(element => {
-        if(verifyElement(element.value , element)){
-            control = control + 0;
-        }else{
-            control = control + 1;
-        }
+        verifyElement(element.value, element)? control = control + 0: ++control;
     });
 
-    if(control === 0){
-        cleanFields(div)
-        return true;
-    }else{
-        return false;
-    }
-    
+    control === 0 ? (
+        cleanFields(div),
+        resp = true
+    ) : (
+        resp = false
+    );
+    return resp;
+
+}
+
+const msgResponse = (title, msg, timer) => {
+    let timerInterval
+    Swal.fire({
+      title: title,
+      html: msg,
+      timer: timer,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading()
+        const b = Swal.getHtmlContainer().querySelector('b')
+        timerInterval = setInterval(() => {
+          b.textContent = Swal.getTimerLeft()
+        }, 100)
+      },
+      willClose: () => {
+        clearInterval(timerInterval)
+      }
+    }).then((result) => {
+      /* Read more about handling dismissals below */
+      if (result.dismiss === Swal.DismissReason.timer) {
+        console.log('booyia')
+      }
+    })
 }
 
 
