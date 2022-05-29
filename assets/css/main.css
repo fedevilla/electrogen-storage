@@ -16,6 +16,14 @@ input[type="text"], input[type="number"]{
     width: 100%;
 }
 
+.provincias{
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #cecece;
+    outline: none !important;
+    width: 100%;
+}
+
 .label-custom{
     font-family: "Roboto";
     font-size: 9px;
@@ -72,3 +80,8 @@ input[type="text"]:focus, input[type="number"] {
     position: relative;
     border: 1px solid #cecece
   }
+
+.detailsAlquiler{
+    padding-bottom: 3px;
+    padding-right: 5px;
+}

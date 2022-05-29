@@ -41,6 +41,7 @@
               <th>Tipo</th>
               <th>Precio Usd</th>
               <th></th>
+              
             </tr>
           </thead>
           <tbody id="electrogeno">
@@ -162,6 +163,7 @@
         </div>
         <div class="modal-body">
           <div id="alquilado-equipo"></div>
+          <div class="demo"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
@@ -170,11 +172,44 @@
     </div>
   </div>
 
+     <!-- Modal alquiler -->
+     <div class="modal fade" id="modal-prueba" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Datos de la entrega</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="datos-entrega">
 
-
-        
+              <label for="" class="label-custom">Direccion</label>
+              <input type="text" id="direccion_alquiler" autocomplete="off">
+              <div><span id="nombre-error"></span></div>
+    
+              <label for="" class="label-custom">Ciudad</label>
+              <input type="text" id="ciudad_alquiler" class="number-field">
+              <div><span id="kva-error"></span></div>
+    
+              <label for="" class="label-custom">Provincia</label>
+              <select name="provincias" id="provincias" class="provincias"></select>
+              <div><span id="precio-error"></span></div>
+              
+            </form>
+            <div class="demo"></div>
+          </div>
+          <div class="modal-footer">
+            <div class="btn-alquiler-equipo"></div>
+           
+            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
     
   </body>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="./assets/js/index.js"></script>
   <script src="./assets/js/index2.js"></script>
 </html>

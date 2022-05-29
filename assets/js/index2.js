@@ -8,6 +8,7 @@ let divAviso = document.getElementById("aviso")
 const btnEliminar = document.getElementById("eliminar-grupo")
 const btnAgregarIndividual = document.getElementById("prueba")
 
+
 refresh();
 
 btnBuscar.addEventListener("click", () => {

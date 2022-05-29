@@ -9,29 +9,9 @@ const ERRORES = {
                  error_equipo: "No se encuentra el equipo buscado",
                  error_deposito: "No existe equipo registrado en el depósito."};
 
-
-//mensajes de inputs
-const ENTRADAS = {msg_voltaje: "Ingrese la cantidad de horas necesarias para calcular voltaje",
-                 }
-
-//Objeto de limites
-const LIMITS = {limit_menu_down: 0, limit_menu_up: 5, limit_down_q_electrogenos: 1, limit_up_q_electrogenos: 5};
 let output = "";
 
- //voltaje
-let voltaje = (tipo, horas) => {
-    if(tipo === 1 || tipo === 2){
-        horas = parseInt(prompt(ENTRADAS.msg_voltaje));
-        while(isNaN(horas)){
-            alert(ERRORES.error_formato);
-            horas = parseInt(prompt(ENTRADAS.msg_voltaje));
-        }
-        const VOLTAJE = 2;
-        return horas * VOLTAJE;
-    }else{
-        alert(ERRORES.error_voltaje);
-    }
-}
+
 
 //Creacion de Clase grupo electrogeno
 class Electrogeno{
@@ -109,9 +89,8 @@ class Deposito{
     obtenerDepositoStorage(){
             let equiposSeleccionados = [];
             for (let i = 0; i < localStorage.length; i++) {
-                    equiposSeleccionados.push(JSON.parse(localStorage.getItem(i)))
+                    equiposSeleccionados.push(JSON.parse(localStorage.getItem(localStorage.key(i))))
             }
-            console.log(localStorage)
            return equiposSeleccionados;
            
          }
@@ -120,7 +99,6 @@ class Deposito{
         agregarAlquiler(Equipo)
         details.innerHTML = "";
         details.innerHTML = '<div class="alert alert-info" id="detalle" role="alert">El equipo seleccionado ha sido enviado a alquiler`</div>';
-
     }
 
 }
@@ -131,8 +109,10 @@ const list = (arr, details) => {
     let output = "";
     if(arr.length > 0){
         for (let i = 0; i < arr.length; i++) {
-            output += `<tr><td>${i}</td><td> ${arr[i].nombre}</td> <td>${arr[i].kva}</td> <td>${arr[i].descripcion}</td> <td>${arr[i].tipo}</td> <td>Usd ${arr[i].precio}</td>
-                       <td><button class="btn btn-outline-success alquilar" style="margin-right: 5px;" id="${i}">Alquilar</button></td></tr>`;
+            output += `<tr><td>${i}</td><td> ${arr[i]?.nombre}</td> <td>${arr[i]?.kva}</td> <td>${arr[i]?.descripcion}</td> <td>${arr[i]?.tipo}</td> <td>Usd ${arr[i]?.precio}</td>
+                       <td><button class="btn btn-outline-success prealquiler" id="${i}" data-bs-toggle="modal" data-bs-target="#modal-prueba">Alquiler</button>
+                       </td>
+                       </tr>`;
         }
         details.innerHTML = "";
         details.innerHTML = '<div class="alert alert-success" id="detalle" role="alert">Existen '+ arr.length +' electrogenos en deposito</div>';
@@ -141,11 +121,11 @@ const list = (arr, details) => {
     }else{
         details.innerHTML = "";
         details.innerHTML = '<div class="alert alert-primary" id="detalle" role="alert">'+ ERRORES.error_deposito+'</div>'
+        
         return output = "";
     }
     
 } 
-
 
 //agrego equipos
 const addEquipo = (nombre, kva, descripcion, tipo, precio) => {
@@ -156,6 +136,7 @@ const addEquipo = (nombre, kva, descripcion, tipo, precio) => {
      //activo equipo
     deposito.agregarEquipo(nuevoEquipo);
     nuevoEquipo.actividad();
+    msgResponse(`Equipo ${nombre} ingrsado con exito`, `El equipo tiene ${kva} kva y es de tipo ${tipo}. El precio ingresado es ${precio}. Si desea modificarlo puede hacerlo luego.`, 5000)
 
     return list(deposito.obtenerDeposito(), divAviso);
 }
@@ -182,60 +163,153 @@ const recorrerDeposito = (deposito) => {
 
 }
 
-
 //agregar equipo alquilado
 
 const agregarAlquiler = (el) => {
     const resposnseFind = deposito.obtenerDepositoStorage();
     let divPadre = document.getElementById("alquilado-equipo")
     let div = document.createElement("div")
+    let direccion = document.getElementById("direccion_alquiler").value;
+    let ciudad = document.getElementById("ciudad_alquiler").value;
+    let provincias = document.getElementById("provincias").value;
     div.classList.add("card-2");
-    div.innerHTML = `    <div style="padding: 10px;">
-    <div style="padding-bottom: 3px;"><b><h3>Equipo: </b> ${resposnseFind[el].nombre}</h3></div>
-    <div style="padding-bottom: 3px;"<b>Descripcion:</b> ${resposnseFind[el].descripcion}</div>
-    <div style="padding-bottom: 3px;"<b>Tipo: </b> ${resposnseFind[el].tipo}</div>
-    <div style="padding-bottom: 3px;"<b>Precio: Usd </b> ${resposnseFind[el].precio}</div>
-    </div>`
+    div.innerHTML = `   <div class="row" style="padding: 10px;">
+                        <div class="col-sm-6">
+                        <div class="detailsAlquiler"><b><h3>Equipo: </b> ${resposnseFind[el].nombre}</h3></div>
+                        <div class="detailsAlquiler"><b>Descripcion:</b> ${resposnseFind[el].descripcion}</div>
+                        <div class="detailsAlquiler"><b>Tipo: </b> ${resposnseFind[el].tipo}</div>
+                        <div class="detailsAlquiler"><b>Precio: Usd </b> ${resposnseFind[el].precio}</div>
+                        </div>
+                        <div class="col-sm-6">
+                        <div class="detailsAlquiler"><b><h3>Localizacion: </b></h3></div>
+                        <div class="detailsAlquiler"><b>Dirección:</b>${direccion}   </div>
+                        <div class="detailsAlquiler"><b>Ciudad:   </b> ${ciudad}  </div>
+                        <div class="detailsAlquiler"><b>Provincia: </b> ${provincias}  </div>
+                        </div>
+                        </div>`
     divPadre.append(div)
+    
+}
+
+//verify direccion alquiler
+const verifyDireccion = (arr) => {
+    let control = 0;
+    arr.forEach((element => {
+        let val = element.value;
+        if(val === ""){
+            element.style.borderColor = "red";
+            ++control;
+        }else{
+            element.style.borderColor = "green";
+        }
+
+    }))
+    return control === 0? true : false;
+}
+
+
+
+//orden
+const search = () => {
+    let arr = [];
+    fetch("/../../provincias.json")
+    .then(response => response.json())
+    .then(datos => {
+
+        for (let provincia of datos.provincias){
+            arr.push({id: provincia.id, option: `<option value=${provincia.nombre}>${provincia.nombre}</option>`});
+        }
+        let select = document.querySelector(".provincias");
+            for (let i = 0; i < arr.length; i++) {
+                select.innerHTML += arr[i].option
+              }
+    });      
+}
+
+const fectchProvincias = () => {
+    let listadoProvincias = new Promise((resolve, reject) => {
+        resolve(search())
+    });
+
+    listadoProvincias.then((result) => {
+        console.log("Provincias actualizadas");
+        
+    })
 }
 
 const loaderEventos = () => {
     if(localStorage.length != 0){
         let arrAlqu = document.querySelectorAll(".alquilar");
-        let arrElim = document.querySelectorAll(".eliminar");
+        let arrPrueba = document.querySelectorAll(".prealquiler");
         agregarEventos(arrAlqu, "alquiler");
-        agregarEventos(arrElim, "eliminar");
+        agregarEventos(arrPrueba, "prealquiler");
+
     }
 }
 
 
+
 //agregaeventos
 const agregarEventos = (arr, evento) => {
+    
     switch (evento) {
         case "alquiler":
             arr.forEach(element => {
                 element.addEventListener("click", () => {
-                    let equipo = element.id;
-                    deposito.alquilarEquipo(equipo, divAviso)
-                    element.disabled = true;
-                    element.innerHTML = "Alquilado"
-                    element.style.background = "red";
-                    element.style.color = "white";
-                    element.style.border = "1px solid white"
+                    let formDireccion = document.querySelectorAll("#datos-entrega input, select")
+                    if(verifyDireccion(formDireccion)){
+                        Swal.fire({
+                            title: '¿Está seguro de alquilar el equipo?',
+                            text: "Al alquilarlo quedara confirmado el alquiler y debera listarlo con el boton listar alquileres.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Alquilar'
+                          }).then((result) => {
+                            let equipo = element.id;
+                            if (result.isConfirmed) {
+                                deposito.alquilarEquipo(equipo, divAviso);
+                                element.setAttribute("disabled","disabled")
+                                let arrPrueba = document.querySelectorAll(".prealquiler");
+                                arrPrueba.forEach((element) => {
+                                    if(element.getAttribute("id") === equipo){
+                                        element.setAttribute("disabled","disabled");
+                                        element.style.backgroundColor = "Red";
+                                        element.style.color = "white";
+                                        element.style.borderColor = "white";
+                                        element.innerHTML = "Alquilado"
+                                    }
+                                })
+                              Swal.fire(
+                                'Equipo alquilado con exito',
+                                'El equipo ha sido reservado',
+                                'success'
+                              )
+                            }
+                            let divDatos = "#datos-entrega"
+                            cleanFields(divDatos);
+                          })
+                    }
+
                 })
             })
             break;
-        
-        case "eliminar":
-            arr.forEach(element => {
-                element.addEventListener("click", () => {
-                    let equipo = element.id;
-                    borrarEquipoStorage(deposito.obtenerDepositoStorage(), divAviso, equipo)
-                    refresh();
+            case "prealquiler":
+                arr.forEach(element => {
+                    element.addEventListener("click", () => {
+                        fectchProvincias();
+                        let equipo = element.id;
+                        let div = document.querySelector(".btn-alquiler-equipo");
+                        let btn = `<button class="btn btn-outline-success alquilar" style="margin-right: 5px;" 
+                                    id="${equipo}"> <i class="fa-solid fa-plus"></i> Alquilar</button>`;
+                        div.innerHTML = btn;
+                        loaderEventos();
+                        
+                    })
                 })
-            })
-             break;
-    
+                break;
+            
         default:
             break;
     }
@@ -261,9 +335,8 @@ const searchEquipo = (details, el) => {
 
 //borra equipo
 const borrarEquipoStorage = (arr, details, equipoEliminar) => {
-    if(arr.length > 0){
-        deposito.eliminarEquipoStorage(equipoEliminar, details);
-    }
+    arr.length > 0 && deposito.eliminarEquipoStorage(equipoEliminar, details)
+
 
 }
 
@@ -305,22 +378,43 @@ const verifyElement = (input, el) => {
 const verifyLoop = (div) => {
     let arrElements = document.querySelectorAll(div + '> input');
     let control = 0;
+    let resp = false;
     arrElements.forEach(element => {
-        if(verifyElement(element.value , element)){
-            control = control + 0;
-        }else{
-            control = control + 1;
-        }
+        verifyElement(element.value, element)? control = control + 0: ++control;
     });
 
-    if(control === 0){
-        cleanFields(div)
-        return true;
-    }else{
-        return false;
-    }
-    
+    control === 0 ? (
+        cleanFields(div),
+        resp = true
+    ) : (
+        resp = false
+    );
+    return resp;
+
 }
 
-
+const msgResponse = (title, msg, timer) => {
+    let timerInterval
+    Swal.fire({
+      title: title,
+      html: msg,
+      timer: timer,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading()
+        const b = Swal.getHtmlContainer().querySelector('b')
+        timerInterval = setInterval(() => {
+          b.textContent = Swal.getTimerLeft()
+        }, 100)
+      },
+      willClose: () => {
+        clearInterval(timerInterval)
+      }
+    }).then((result) => {
+      /* Read more about handling dismissals below */
+      if (result.dismiss === Swal.DismissReason.timer) {
+        console.log('booyia')
+      }
+    })
+}
 
