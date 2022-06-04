@@ -1,6 +1,4 @@
-/* Este es un desarrollo que servira para administrar grupos electrogenos
-en tres aspectos: alquiler, venta y mantenimiento de correctivo
- */
+/* Este desarrollo servira para alquilar grupos electrogenos.*/
 
 //creo objeto de errores
 const ERRORES = {
