@@ -11,8 +11,6 @@ const ERRORES = {
 
 let output = "";
 
-
-
 //Creacion de Clase grupo electrogeno
 class Electrogeno{
     constructor(nombre, kva, descripcion, tipo, precio){
@@ -52,27 +50,6 @@ class Deposito{
         this.nuevoEquipo.push(Equipo)
     }
 
-    eliminarEquipo(Equipo, details){
-
-        const index = this.nuevoEquipo.map(obj => obj.nombre).indexOf(Equipo);
-        if(index != -1){
-            this.nuevoEquipo.splice(index, 1);
-            details.innerHTML = "";
-            details.innerHTML = '<div class="alert alert-danger" id="detalle" role="alert">El equipo ' + Equipo +  ' ha sido eliminado del depósito`</div>';
-            
-        }else{
-            details.innerHTML = "";
-            details.innerHTML = '<div class="alert alert-danger" id="detalle" role="alert">El equipo ' + Equipo +  'no se encuentra registrado en deposito`</div>';
-        }
-
-    }
-
-    eliminarEquipoStorage(equipo, details){
-        localStorage.removeItem(equipo);
-        details.innerHTML = "";
-        details.innerHTML = '<div class="alert alert-danger" id="detalle" role="alert">El equipo ' + equipo +  ' ha sido eliminado del depósito`</div>';
-    }
-
     obtenerDeposito(){
        let equiposSeleccionados = [];
        for (let i = 0; i < this.nuevoEquipo.length; i++) {
@@ -85,7 +62,7 @@ class Deposito{
       
     }
 
-        //con storage
+    //con storage
     obtenerDepositoStorage(){
             let equiposSeleccionados = [];
             for (let i = 0; i < localStorage.length; i++) {
@@ -136,11 +113,10 @@ const addEquipo = (nombre, kva, descripcion, tipo, precio) => {
      //activo equipo
     deposito.agregarEquipo(nuevoEquipo);
     nuevoEquipo.actividad();
-    msgResponse(`Equipo ${nombre} ingrsado con exito`, `El equipo tiene ${kva} kva y es de tipo ${tipo}. El precio ingresado es ${precio}. Si desea modificarlo puede hacerlo luego.`, 5000)
+    msgResponse(`Equipo ${nombre} ingresado con exito`, `El equipo tiene ${kva} kva y es de tipo ${tipo}. El precio ingresado es ${precio}. Si desea modificarlo puede hacerlo luego.`, 5000)
 
     return list(deposito.obtenerDeposito(), divAviso);
 }
-
 
 
 //agregar Local Storage
@@ -173,6 +149,7 @@ const agregarAlquiler = (el) => {
     let ciudad = document.getElementById("ciudad_alquiler").value;
     let provincias = document.getElementById("provincias").value;
     div.classList.add("card-2");
+    divPadre.innerHTML = "";
     div.innerHTML = `   <div class="row" style="padding: 10px;">
                         <div class="col-sm-6">
                         <div class="detailsAlquiler"><b><h3>Equipo: </b> ${resposnseFind[el].nombre}</h3></div>
@@ -207,8 +184,6 @@ const verifyDireccion = (arr) => {
     return control === 0? true : false;
 }
 
-
-
 //orden
 const search = () => {
     let arr = [];
@@ -216,14 +191,14 @@ const search = () => {
     .then(response => response.json())
     .then(datos => {
 
-        for (let provincia of datos.provincias){
-            arr.push({id: provincia.id, option: `<option value=${provincia.nombre}>${provincia.nombre}</option>`});
-        }
-        let select = document.querySelector(".provincias");
-            for (let i = 0; i < arr.length; i++) {
-                select.innerHTML += arr[i].option
-              }
-    });      
+    for (let provincia of datos.provincias){
+        arr.push({id: provincia.id, option: `<option value=${provincia.nombre}>${provincia.nombre}</option>`});
+    }
+    let select = document.querySelector(".provincias");
+        for (let i = 0; i < arr.length; i++) {
+            select.innerHTML += arr[i].option
+            }
+});      
 }
 
 const fectchProvincias = () => {
@@ -233,7 +208,6 @@ const fectchProvincias = () => {
 
     listadoProvincias.then((result) => {
         console.log("Provincias actualizadas");
-        
     })
 }
 
@@ -243,11 +217,8 @@ const loaderEventos = () => {
         let arrPrueba = document.querySelectorAll(".prealquiler");
         agregarEventos(arrAlqu, "alquiler");
         agregarEventos(arrPrueba, "prealquiler");
-
     }
 }
-
-
 
 //agregaeventos
 const agregarEventos = (arr, evento) => {
@@ -316,28 +287,21 @@ const agregarEventos = (arr, evento) => {
 
 }
 
-
-
 //busca equipo
-const searchEquipo = (details, el) => {
+const searchEquipo = (el) => {
     
-    const resposnseFind = deposito.obtenerDeposito().find((element) => element.Equipo == el);
+    const resposnseFind = deposito.obtenerDepositoStorage().find((element) => element.nombre == el);
     if(resposnseFind != undefined){
-        details.innerHTML = "";
-        details.innerHTML = '<div class="alert alert-info" id="detalle" role="alert">El equipo '+resposnseFind.Equipo+' se encuentra en sistema.</div>'
+        msgResponse("Equipo encontrado", 'El equipo con nombre '+resposnseFind.nombre+' se encuentra registrado', 2000);
         el.value = "";
-        
     }else{
-        details.innerHTML = "";
-        details.innerHTML = '<div class="alert alert-danger" id="detalle" role="alert">'+ERRORES.error_equipo+'. El equipo <b>'+el+'</b> no fue creado o tiene un error de tipeo.</div>';
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'El equipo '+el+' no fue creado o tiene un error de tipeo.',
+            footer: 'Vuelva a intentarlo.'
+          })
     }
-}
-
-//borra equipo
-const borrarEquipoStorage = (arr, details, equipoEliminar) => {
-    arr.length > 0 && deposito.eliminarEquipoStorage(equipoEliminar, details)
-
-
 }
 
 //refresh

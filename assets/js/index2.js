@@ -8,12 +8,11 @@ let divAviso = document.getElementById("aviso")
 const btnEliminar = document.getElementById("eliminar-grupo")
 const btnAgregarIndividual = document.getElementById("prueba")
 
-
 refresh();
 
 btnBuscar.addEventListener("click", () => {
     let element = document.getElementById("nombre-buscar").value;
-    searchEquipo(divAviso, element)
+    searchEquipo(element)
 });
 
 btnAgregar.addEventListener("click", () => {
@@ -23,8 +22,8 @@ btnAgregar.addEventListener("click", () => {
      let descripcion = document.getElementById("descripcion").value;
      let tipo = document.getElementById("tipo").value;
      let precio = document.getElementById("precio").value;
-
      let form = '#guardar-grupo';
+
      if(verifyLoop(form)){
         table.innerHTML = addEquipo(nombre, kva, descripcion, tipo, precio);
         recorrerDeposito(deposito);
