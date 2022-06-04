@@ -185,7 +185,7 @@ const verifyDireccion = (arr) => {
 //orden
 const search = () => {
     let arr = [];
-    fetch("/../../provincias.json")
+    fetch("./provincias.json")
     .then(response => response.json())
     .then(datos => {
 
